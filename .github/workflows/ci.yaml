@@ -1,0 +1,60 @@
+name: CI Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to server
+        run: echo "Deploying to production server..."
+        # Replace with your actual deployment script or commands
+
+  notify:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/heads/dev')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send notification
+        run: echo "Code pushed to dev branch"
+        # Replace with your actual notification script or commands
